@@ -654,16 +654,34 @@ export type CanvasActions = Partial<{
   saveToActiveFile: boolean;
   toggleTheme: boolean | null;
   saveAsImage: boolean;
+  searchMenu: boolean;
+  help: boolean;
+  socials: boolean;
 }>;
 
 export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
   tools: {
+    lock: boolean;
     image: boolean;
+    selection: boolean;
+    hand: boolean;
+    rectangle: boolean;
+    diamond: boolean;
+    ellipse: boolean;
+    arrow: boolean;
+    line: boolean;
+    draw: boolean;
+    text: boolean;
+    eraser: boolean;
+    dropdown: boolean;
+    hideShortcuts?: boolean;
   };
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
+  sideBar?: boolean;
+  mobileTools?: boolean;
 }>;
 
 export type AppProps = Merge<

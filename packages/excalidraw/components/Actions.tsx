@@ -178,6 +178,7 @@ export const SelectedShapeActions = ({
           {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
         </>
+        // TODO: Sloppiness default should be none for libraryModeEnabled
       )}
 
       {(canChangeRoundness(appState.activeTool.type) ||
@@ -333,7 +334,9 @@ export const ShapesSwitcher = ({
               checked={activeTool.type === value}
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${shortcut}`}
-              keyBindingLabel={numericKey || letter}
+              keyBindingLabel={
+                UIOptions.tools?.hideShortcuts ? null : numericKey || letter
+              }
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}
@@ -366,99 +369,106 @@ export const ShapesSwitcher = ({
           );
         },
       )}
-      <div className="App-toolbar__divider" />
 
-      <DropdownMenu open={isExtraToolsMenuOpen}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected":
-              frameToolSelected ||
-              embeddableToolSelected ||
-              lassoToolSelected ||
-              // in collab we're already highlighting the laser button
-              // outside toolbar, so let's not highlight extra-tools button
-              // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
-          })}
-          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
-          title={t("toolBar.extraTools")}
-        >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-          onSelect={() => setIsExtraToolsMenuOpen(false)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
-          >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          {app.defaultSelectionTool !== "lasso" && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "lasso" })}
-              icon={LassoIcon}
-              data-testid="toolbar-lasso"
-              selected={lassoToolSelected}
+      {UIOptions.tools?.dropdown && (
+        <>
+          <div className="App-toolbar__divider" />
+
+          <DropdownMenu open={isExtraToolsMenuOpen}>
+            <DropdownMenu.Trigger
+              className={clsx("App-toolbar__extra-tools-trigger", {
+                "App-toolbar__extra-tools-trigger--selected":
+                  frameToolSelected ||
+                  embeddableToolSelected ||
+                  lassoToolSelected ||
+                  // in collab we're already highlighting the laser button
+                  // outside toolbar, so let's not highlight extra-tools button
+                  // on top of it
+                  (laserToolSelected && !app.props.isCollaborating),
+              })}
+              onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+              title={t("toolBar.extraTools")}
             >
-              {t("toolBar.lasso")}
-            </DropdownMenu.Item>
-          )}
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <>
+              {frameToolSelected
+                ? frameToolIcon
+                : embeddableToolSelected
+                  ? EmbedIcon
+                  : laserToolSelected && !app.props.isCollaborating
+                    ? laserPointerToolIcon
+                    : lassoToolSelected
+                      ? LassoIcon
+                      : extraToolsIcon}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
+              onClickOutside={() => setIsExtraToolsMenuOpen(false)}
+              onSelect={() => setIsExtraToolsMenuOpen(false)}
+              className="App-toolbar__extra-tools-dropdown"
+            >
               <DropdownMenu.Item
-                onSelect={() => app.onMagicframeToolSelect()}
-                icon={MagicIcon}
-                data-testid="toolbar-magicframe"
+                onSelect={() => app.setActiveTool({ type: "frame" })}
+                icon={frameToolIcon}
+                shortcut={KEYS.F.toLocaleUpperCase()}
+                data-testid="toolbar-frame"
+                selected={frameToolSelected}
               >
-                {t("toolBar.magicframe")}
-                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+                {t("toolBar.frame")}
               </DropdownMenu.Item>
-            </>
-          )}
-        </DropdownMenu.Content>
-      </DropdownMenu>
+              <DropdownMenu.Item
+                onSelect={() => app.setActiveTool({ type: "embeddable" })}
+                icon={EmbedIcon}
+                data-testid="toolbar-embeddable"
+                selected={embeddableToolSelected}
+              >
+                {t("toolBar.embeddable")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => app.setActiveTool({ type: "laser" })}
+                icon={laserPointerToolIcon}
+                data-testid="toolbar-laser"
+                selected={laserToolSelected}
+                shortcut={KEYS.K.toLocaleUpperCase()}
+              >
+                {t("toolBar.laser")}
+              </DropdownMenu.Item>
+              {app.defaultSelectionTool !== "lasso" && (
+                <DropdownMenu.Item
+                  onSelect={() => app.setActiveTool({ type: "lasso" })}
+                  icon={LassoIcon}
+                  data-testid="toolbar-lasso"
+                  selected={lassoToolSelected}
+                >
+                  {t("toolBar.lasso")}
+                </DropdownMenu.Item>
+              )}
+              <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
+                Generate
+              </div>
+              {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
+              <DropdownMenu.Item
+                onSelect={() =>
+                  app.setOpenDialog({ name: "ttd", tab: "mermaid" })
+                }
+                icon={mermaidLogoIcon}
+                data-testid="toolbar-embeddable"
+              >
+                {t("toolBar.mermaidToExcalidraw")}
+              </DropdownMenu.Item>
+              {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
+                <>
+                  <DropdownMenu.Item
+                    onSelect={() => app.onMagicframeToolSelect()}
+                    icon={MagicIcon}
+                    data-testid="toolbar-magicframe"
+                  >
+                    {t("toolBar.magicframe")}
+                    <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+                  </DropdownMenu.Item>
+                </>
+              )}
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        </>
+      )}
     </>
   );
 };

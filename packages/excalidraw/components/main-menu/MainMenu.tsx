@@ -34,6 +34,18 @@ const MainMenu = Object.assign(
         ? undefined
         : () => setAppState({ openMenu: null });
 
+      if (!children) {
+        return null;
+      }
+
+      const childrenLength = React.Children.toArray(children).length;
+
+      if (childrenLength === 0) {
+        return null;
+      }
+
+      // TODO: handle single child
+
       return (
         <MainMenuTunnel.In>
           <DropdownMenu open={appState.openMenu === "canvas"}>

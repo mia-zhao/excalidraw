@@ -68,8 +68,23 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       ...canvasActions,
     },
     tools: {
-      image: props.UIOptions?.tools?.image ?? true,
+      lock: props.UIOptions?.tools?.lock ?? false,
+      image: props.UIOptions?.tools?.image ?? false,
+      selection: props.UIOptions?.tools?.selection ?? true,
+      hand: props.UIOptions?.tools?.hand ?? true,
+      rectangle: props.UIOptions?.tools?.rectangle ?? true,
+      diamond: props.UIOptions?.tools?.diamond ?? false,
+      ellipse: props.UIOptions?.tools?.ellipse ?? true,
+      arrow: props.UIOptions?.tools?.arrow ?? false,
+      line: props.UIOptions?.tools?.line ?? true,
+      draw: props.UIOptions?.tools?.draw ?? true,
+      text: props.UIOptions?.tools?.text ?? true,
+      eraser: props.UIOptions?.tools?.eraser ?? true,
+      dropdown: props.UIOptions?.tools?.dropdown ?? false,
+      hideShortcuts: props.UIOptions?.tools?.hideShortcuts ?? true,
     },
+    sideBar: props.UIOptions?.sideBar ?? false,
+    mobileTools: props.UIOptions?.mobileTools ?? false,
   };
 
   if (canvasActions?.export) {
