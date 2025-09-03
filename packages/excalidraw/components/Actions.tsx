@@ -65,7 +65,13 @@ import {
   LassoIcon,
 } from "./icons";
 
-import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type {
+  ActionName,
+  AppClassProperties,
+  AppProps,
+  UIAppState,
+  Zoom,
+} from "../types";
 import type { ActionManager } from "../actions/manager";
 
 export const canChangeStrokeColor = (
@@ -106,13 +112,26 @@ export const SelectedShapeActions = ({
   elementsMap,
   renderAction,
   app,
+  actionOptions,
 }: {
   appState: UIAppState;
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
+  actionOptions: AppProps["UIOptions"]["actionOptions"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+
+  const isActionEnabled = (action: string) => {
+    if (actionOptions?.all?.[action as ActionName] === false) {
+      return false;
+    }
+    const elementActionOptions =
+      targetElements.length === 1
+        ? actionOptions?.[targetElements[0].type]
+        : null;
+    return elementActionOptions?.[action as ActionName] !== false;
+  };
 
   let isSingleElementBoundContainer = false;
   if (
@@ -156,68 +175,87 @@ export const SelectedShapeActions = ({
   return (
     <div className="selected-shape-actions">
       <div>
-        {canChangeStrokeColor(appState, targetElements) &&
+        {isActionEnabled("changeStrokeColor") &&
+          canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
       </div>
-      {canChangeBackgroundColor(appState, targetElements) && (
-        <div>{renderAction("changeBackgroundColor")}</div>
-      )}
-      {showFillIcons && renderAction("changeFillStyle")}
+      {isActionEnabled("changeBackgroundColor") &&
+        canChangeBackgroundColor(appState, targetElements) && (
+          <div>{renderAction("changeBackgroundColor")}</div>
+        )}
+      {showFillIcons &&
+        isActionEnabled("changeFillStyle") &&
+        renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
+        isActionEnabled("changeStrokeWidth") &&
         renderAction("changeStrokeWidth")}
 
       {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
+        isActionEnabled("changeStrokeShape") &&
         renderAction("changeStrokeShape")}
 
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
+          {isActionEnabled("changeStrokeStyle") &&
+            renderAction("changeStrokeStyle")}
+          {isActionEnabled("changeSloppiness") &&
+            renderAction("changeSloppiness")}
         </>
-        // TODO: Sloppiness default should be none for libraryModeEnabled
       )}
 
       {(canChangeRoundness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <>{renderAction("changeRoundness")}</>
+        <>
+          {isActionEnabled("changeRoundness") &&
+            renderAction("changeRoundness")}
+        </>
       )}
 
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (
-        <>{renderAction("changeArrowType")}</>
+        <>
+          {isActionEnabled("changeArrowType") &&
+            renderAction("changeArrowType")}
+        </>
       )}
 
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
-          {renderAction("changeFontFamily")}
-          {renderAction("changeFontSize")}
+          {isActionEnabled("changeFontFamily") &&
+            renderAction("changeFontFamily")}
+          {isActionEnabled("changeFontSize") && renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
+            isActionEnabled("changeTextAlign") &&
             renderAction("changeTextAlign")}
         </>
       )}
 
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+        isActionEnabled("changeVerticalAlign") &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
-        <>{renderAction("changeArrowhead")}</>
+        <>
+          {isActionEnabled("changeArrowhead") &&
+            renderAction("changeArrowhead")}
+        </>
       )}
 
-      {renderAction("changeOpacity")}
+      {isActionEnabled("changeOpacity") && renderAction("changeOpacity")}
 
       <fieldset>
         <legend>{t("labels.layers")}</legend>
         <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
+          {isActionEnabled("sendToBack") && renderAction("sendToBack")}
+          {isActionEnabled("sendBackward") && renderAction("sendBackward")}
+          {isActionEnabled("bringForward") && renderAction("bringForward")}
+          {isActionEnabled("bringToFront") && renderAction("bringToFront")}
         </div>
       </fieldset>
 
@@ -231,18 +269,21 @@ export const SelectedShapeActions = ({
             }
             {isRTL ? (
               <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
+                {isActionEnabled("alignRight") && renderAction("alignRight")}
+                {isActionEnabled("alignHorizontallyCentered") &&
+                  renderAction("alignHorizontallyCentered")}
+                {isActionEnabled("alignLeft") && renderAction("alignLeft")}
               </>
             ) : (
               <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
+                {isActionEnabled("alignLeft") && renderAction("alignLeft")}
+                {isActionEnabled("alignHorizontallyCentered") &&
+                  renderAction("alignHorizontallyCentered")}
+                {isActionEnabled("alignRight") && renderAction("alignRight")}
               </>
             )}
             {targetElements.length > 2 &&
+              isActionEnabled("distributeHorizontally") &&
               renderAction("distributeHorizontally")}
             {/* breaks the row ˇˇ */}
             <div style={{ flexBasis: "100%", height: 0 }} />
@@ -254,10 +295,12 @@ export const SelectedShapeActions = ({
                 marginTop: "-0.5rem",
               }}
             >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
+              {isActionEnabled("alignTop") && renderAction("alignTop")}
+              {isActionEnabled("alignVerticallyCentered") &&
+                renderAction("alignVerticallyCentered")}
+              {isActionEnabled("alignBottom") && renderAction("alignBottom")}
               {targetElements.length > 2 &&
+                isActionEnabled("distributeVertically") &&
                 renderAction("distributeVertically")}
             </div>
           </div>
@@ -267,13 +310,23 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
-            {renderAction("group")}
-            {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
+            {!device.editor.isMobile &&
+              isActionEnabled("duplicateSelection") &&
+              renderAction("duplicateSelection")}
+            {!device.editor.isMobile &&
+              isActionEnabled("deleteSelectedElements") &&
+              renderAction("deleteSelectedElements")}
+            {isActionEnabled("group") && renderAction("group")}
+            {isActionEnabled("ungroup") && renderAction("ungroup")}
+            {showLinkIcon &&
+              isActionEnabled("hyperlink") &&
+              renderAction("hyperlink")}
+            {showCropEditorAction &&
+              isActionEnabled("cropEditor") &&
+              renderAction("cropEditor")}
+            {showLineEditorAction &&
+              isActionEnabled("toggleLinearEditor") &&
+              renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
       )}
@@ -327,7 +380,7 @@ export const ShapesSwitcher = ({
 
           return (
             <ToolButton
-              className={clsx("Shape", { fillable })}
+              className={clsx("Shape")}
               key={value}
               type="radio"
               icon={icon}
