@@ -659,6 +659,48 @@ export type CanvasActions = Partial<{
   socials: boolean;
 }>;
 
+export type ActionName =
+  | "changeStrokeColor"
+  | "changeBackgroundColor"
+  | "changeFillStyle"
+  | "changeStrokeWidth"
+  | "changeStrokeShape"
+  | "changeStrokeStyle"
+  | "changeSloppiness"
+  | "changeRoundness"
+  | "changeArrowType"
+  | "changeFontFamily"
+  | "changeFontSize"
+  | "changeTextAlign"
+  | "changeVerticalAlign"
+  | "changeArrowhead"
+  | "changeOpacity"
+  | "sendToBack"
+  | "sendBackward"
+  | "bringForward"
+  | "bringToFront"
+  | "alignRight"
+  | "alignHorizontallyCentered"
+  | "alignLeft"
+  | "distributeHorizontally"
+  | "alignTop"
+  | "alignVerticallyCentered"
+  | "alignBottom"
+  | "distributeVertically"
+  | "duplicateSelection"
+  | "deleteSelectedElements"
+  | "group"
+  | "ungroup"
+  | "hyperlink"
+  | "cropEditor"
+  | "toggleLinearEditor";
+
+type ElementActionOptions = Partial<Record<ActionName, boolean>>;
+
+export type ActionOptions = Partial<
+  Record<ExcalidrawElementType | "all", ElementActionOptions>
+>;
+
 export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
@@ -682,6 +724,7 @@ export type UIOptions = Partial<{
   welcomeScreen?: boolean;
   sideBar?: boolean;
   mobileTools?: boolean;
+  actionOptions?: ActionOptions;
 }>;
 
 export type AppProps = Merge<
