@@ -102,24 +102,34 @@ const DefaultMainMenu: React.FC<{
 }> = ({ UIOptions }) => {
   return (
     <MainMenu __fallback>
-      <MainMenu.DefaultItems.LoadScene />
-      <MainMenu.DefaultItems.SaveToActiveFile />
+      {UIOptions.canvasActions.loadScene && <MainMenu.DefaultItems.LoadScene />}
+      {UIOptions.canvasActions.saveToActiveFile && (
+        <MainMenu.DefaultItems.SaveToActiveFile />
+      )}
       {/* FIXME we should to test for this inside the item itself */}
       {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
       {/* FIXME we should to test for this inside the item itself */}
       {UIOptions.canvasActions.saveAsImage && (
         <MainMenu.DefaultItems.SaveAsImage />
       )}
-      <MainMenu.DefaultItems.SearchMenu />
-      <MainMenu.DefaultItems.Help />
-      <MainMenu.DefaultItems.ClearCanvas />
-      <MainMenu.Separator />
-      <MainMenu.Group title="Excalidraw links">
-        <MainMenu.DefaultItems.Socials />
-      </MainMenu.Group>
-      <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme />
-      <MainMenu.DefaultItems.ChangeCanvasBackground />
+      {UIOptions.canvasActions.searchMenu && (
+        <MainMenu.DefaultItems.SearchMenu />
+      )}
+      {UIOptions.canvasActions.help && <MainMenu.DefaultItems.Help />}
+      {UIOptions.canvasActions.clearCanvas && (
+        <MainMenu.DefaultItems.ClearCanvas />
+      )}
+      {UIOptions.canvasActions.socials && (
+        <>
+          <MainMenu.Separator />
+          <MainMenu.Group title="Excalidraw links">
+            <MainMenu.DefaultItems.Socials />
+          </MainMenu.Group>
+          <MainMenu.Separator />
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+        </>
+      )}
     </MainMenu>
   );
 };
@@ -283,20 +293,23 @@ const LayerUI = ({
                           />
                           {heading}
                           <Stack.Row gap={1}>
-                            <PenModeButton
-                              zenModeEnabled={appState.zenModeEnabled}
-                              checked={appState.penMode}
-                              onChange={() => onPenModeToggle(null)}
-                              title={t("toolBar.penMode")}
-                              penDetected={appState.penDetected}
-                            />
-                            <LockButton
-                              checked={appState.activeTool.locked}
-                              onChange={onLockToggle}
-                              title={t("toolBar.lock")}
-                            />
-
-                            <div className="App-toolbar__divider" />
+                            {UIOptions.tools?.lock && (
+                              <>
+                                <PenModeButton
+                                  zenModeEnabled={appState.zenModeEnabled}
+                                  checked={appState.penMode}
+                                  onChange={() => onPenModeToggle(null)}
+                                  title={t("toolBar.penMode")}
+                                  penDetected={appState.penDetected}
+                                />
+                                <LockButton
+                                  checked={appState.activeTool.locked}
+                                  onChange={onLockToggle}
+                                  title={t("toolBar.lock")}
+                                />
+                                <div className="App-toolbar__divider" />
+                              </>
+                            )}
 
                             <HandButton
                               checked={isHandToolActive(appState)}
@@ -403,23 +416,26 @@ const LayerUI = ({
           tunneled away. We only render tunneled components that actually
         have defaults when host do not render anything. */}
       <DefaultMainMenu UIOptions={UIOptions} />
-      <DefaultSidebar.Trigger
-        __fallback
-        icon={LibraryIcon}
-        title={capitalizeString(t("toolBar.library"))}
-        onToggle={(open) => {
-          if (open) {
-            trackEvent(
-              "sidebar",
-              `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${device.editor.isMobile ? "mobile" : "desktop"})`,
-            );
-          }
-        }}
-        tab={DEFAULT_SIDEBAR.defaultTab}
-      >
-        {t("toolBar.library")}
-      </DefaultSidebar.Trigger>
+      {UIOptions.sideBar && (
+        <DefaultSidebar.Trigger
+          __fallback
+          icon={LibraryIcon}
+          title={capitalizeString(t("toolBar.library"))}
+          onToggle={(open) => {
+            if (open) {
+              trackEvent(
+                "sidebar",
+                `${DEFAULT_SIDEBAR.name} (open)`,
+                `button (${device.editor.isMobile ? "mobile" : "desktop"})`,
+              );
+            }
+          }}
+          tab={DEFAULT_SIDEBAR.defaultTab}
+        >
+          {t("toolBar.library")}
+        </DefaultSidebar.Trigger>
+      )}
+
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
       {/* ------------------------------------------------------------------ */}
@@ -452,8 +468,8 @@ const LayerUI = ({
                       ? "strokeColor"
                       : "backgroundColor"
                     : colorPickerType === "elementBackground"
-                    ? "backgroundColor"
-                    : "strokeColor"]: color,
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
                 });
                 ShapeCache.delete(element);
               }

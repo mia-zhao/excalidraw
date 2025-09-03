@@ -96,31 +96,33 @@ export const MobileMenu = ({
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
-                <div className="mobile-misc-tools-container">
-                  {!appState.viewModeEnabled &&
-                    appState.openDialog?.name !== "elementLinkSelector" && (
-                      <DefaultSidebarTriggerTunnel.Out />
-                    )}
-                  <PenModeButton
-                    checked={appState.penMode}
-                    onChange={() => onPenModeToggle(null)}
-                    title={t("toolBar.penMode")}
-                    isMobile
-                    penDetected={appState.penDetected}
-                  />
-                  <LockButton
-                    checked={appState.activeTool.locked}
-                    onChange={onLockToggle}
-                    title={t("toolBar.lock")}
-                    isMobile
-                  />
-                  <HandButton
-                    checked={isHandToolActive(appState)}
-                    onChange={() => onHandToolToggle()}
-                    title={t("toolBar.hand")}
-                    isMobile
-                  />
-                </div>
+                {UIOptions.mobileTools && (
+                  <div className="mobile-misc-tools-container">
+                    {!appState.viewModeEnabled &&
+                      appState.openDialog?.name !== "elementLinkSelector" && (
+                        <DefaultSidebarTriggerTunnel.Out />
+                      )}
+                    <PenModeButton
+                      checked={appState.penMode}
+                      onChange={() => onPenModeToggle(null)}
+                      title={t("toolBar.penMode")}
+                      isMobile
+                      penDetected={appState.penDetected}
+                    />
+                    <LockButton
+                      checked={appState.activeTool.locked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                      isMobile
+                    />
+                    <HandButton
+                      checked={isHandToolActive(appState)}
+                      onChange={() => onHandToolToggle()}
+                      title={t("toolBar.hand")}
+                      isMobile
+                    />
+                  </div>
+                )}
               </Stack.Row>
             </Stack.Col>
           )}
