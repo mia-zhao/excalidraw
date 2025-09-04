@@ -518,44 +518,17 @@ export const actionChangeStrokeWidth = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
-      <div className="buttonList">
-        <RadioSelection
-          group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => element.strokeWidth,
-            (element) => element.hasOwnProperty("strokeWidth"),
-            (hasSelection) =>
-              hasSelection ? null : appState.currentItemStrokeWidth,
-          )}
-          onChange={(value) => updateData(value)}
-        />
-      </div>
-    </fieldset>
+  PanelComponent: ({ app, updateData }) => (
+    <Range
+      label={t("labels.strokeWidth")}
+      updateData={updateData}
+      app={app}
+      property="strokeWidth"
+      min={1}
+      max={20}
+      step={1}
+      testId="strokeWidth"
+    />
   ),
 });
 
@@ -686,7 +659,16 @@ export const actionChangeOpacity = register({
     };
   },
   PanelComponent: ({ app, updateData }) => (
-    <Range updateData={updateData} app={app} testId="opacity" />
+    <Range
+      label={t("labels.opacity")}
+      updateData={updateData}
+      app={app}
+      property="opacity"
+      min={0}
+      max={100}
+      step={10}
+      testId="opacity"
+    />
   ),
 });
 
