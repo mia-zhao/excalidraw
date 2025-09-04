@@ -286,12 +286,14 @@ const LayerUI = ({
                             "zen-mode": appState.zenModeEnabled,
                           })}
                         >
-                          <HintViewer
-                            appState={appState}
-                            isMobile={device.editor.isMobile}
-                            device={device}
-                            app={app}
-                          />
+                          {UIOptions.canvasActions?.help && (
+                            <HintViewer
+                              appState={appState}
+                              isMobile={device.editor.isMobile}
+                              device={device}
+                              app={app}
+                            />
+                          )}
                           {heading}
                           <Stack.Row gap={1}>
                             {UIOptions.tools?.lock && (
@@ -561,6 +563,7 @@ const LayerUI = ({
             {renderWelcomeScreen && <tunnels.WelcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}
             <Footer
+              UIOptions={UIOptions}
               appState={appState}
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}

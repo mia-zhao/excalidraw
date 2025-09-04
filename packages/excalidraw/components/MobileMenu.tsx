@@ -87,6 +87,14 @@ export const MobileMenu = ({
                 <Island padding={1} className="App-toolbar App-toolbar--mobile">
                   {heading}
                   <Stack.Row gap={1}>
+                    {!UIOptions.mobileTools && (
+                      <HandButton
+                        checked={isHandToolActive(appState)}
+                        onChange={() => onHandToolToggle()}
+                        title={t("toolBar.hand")}
+                        isMobile
+                      />
+                    )}
                     <ShapesSwitcher
                       appState={appState}
                       activeTool={appState.activeTool}
@@ -127,12 +135,14 @@ export const MobileMenu = ({
             </Stack.Col>
           )}
         </Section>
-        <HintViewer
-          appState={appState}
-          isMobile={true}
-          device={device}
-          app={app}
-        />
+        {UIOptions.canvasActions?.help && (
+          <HintViewer
+            appState={appState}
+            isMobile={true}
+            device={device}
+            app={app}
+          />
+        )}
       </FixedSideContainer>
     );
   };

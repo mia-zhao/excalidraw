@@ -8,14 +8,16 @@ import { Section } from "../Section";
 import Stack from "../Stack";
 
 import type { ActionManager } from "../../actions/manager";
-import type { UIAppState } from "../../types";
+import type { UIAppState, AppProps } from "../../types";
 
 const Footer = ({
+  UIOptions,
   appState,
   actionManager,
   showExitZenModeBtn,
   renderWelcomeScreen,
 }: {
+  UIOptions: AppProps["UIOptions"];
   appState: UIAppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
@@ -61,9 +63,11 @@ const Footer = ({
       >
         <div style={{ position: "relative" }}>
           {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
-          <HelpButton
-            onClick={() => actionManager.executeAction(actionShortcuts)}
-          />
+          {UIOptions.canvasActions?.help && (
+            <HelpButton
+              onClick={() => actionManager.executeAction(actionShortcuts)}
+            />
+          )}
         </div>
       </div>
       <ExitZenModeAction
